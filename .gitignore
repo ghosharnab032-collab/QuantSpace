@@ -1,0 +1,138 @@
+.env
+.env.example
+# ============================================================
+# PYTHON
+# ============================================================
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+.venv/
+venv/
+env/
+ENV/
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ============================================================
+# ENVIRONMENT / SECRETS
+# ============================================================
+
+.env
+.env.*
+!.env.example
+
+# ============================================================
+# IDE / EDITOR
+# ============================================================
+
+.vscode/
+.idea/
+
+# ============================================================
+# FRONTEND / NODE
+# ============================================================
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.next/
+frontend/coverage/
+
+# ============================================================
+# BUILD / GENERATED FILES
+# ============================================================
+
+build/
+dist/
+*.egg-info/
+
+# ============================================================
+# DATABASE / LOCAL DATA
+# ============================================================
+
+# Local SQLite database
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# ============================================================
+# GENERATED / DERIVED DATA
+# ============================================================
+
+derived/
+
+# ============================================================
+# LOGS / TEMPORARY FILES
+# ============================================================
+
+*.log
+*.tmp
+*.temp
+
+# ============================================================
+# OS
+# ============================================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+app.db
+# Node
+node_modules/
+frontend/node_modules/
+
+# Frontend build
+frontend/dist/
+frontend/.vite/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# Local databases
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Generated data
+derived/
+
+# Logs
+*.log
+*.tmp
+*.temp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+# Raw NSE market-data downloads
+raw/
+
+# Generated NSE security-master downloads
+data/NSE_CM_security_*.csv
+data/NSE_CM_security_*.csv.gz
