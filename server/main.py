@@ -1,7 +1,14 @@
 """Quant Space FastAPI application."""
-
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from server.db.database import close_db_client, init_db
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+    await close_db_client()
 
 
 # ============================================================
@@ -45,6 +52,7 @@ app = FastAPI(
         "portfolio optimization, backtesting, "
         "and Black-Scholes option analytics."
     ),
+    lifespan=lifespan,
 )
 
 
