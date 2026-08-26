@@ -1,4 +1,4 @@
-﻿"""
+"""
 Read-only historical query utilities for the quant data layer.
 
 This module sits on top of data_access.py and trading_calendar.py.

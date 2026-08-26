@@ -1,4 +1,4 @@
-﻿"""
+"""
 data/unified_quant_data.py
 --------------------------
 Unified Quant Data Interface — application-facing API.
