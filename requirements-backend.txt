@@ -2,4 +2,4 @@ fastapi
 uvicorn[standard]
 pydantic
 PyJWT
-pwdlib
+pwdlib[argon2]
