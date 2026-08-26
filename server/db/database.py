@@ -13,13 +13,23 @@ from server.db.schema import SCHEMA_STATEMENTS
 _db_client: Optional[object] = None
 
 
+def _get_http_database_url() -> str:
+    """Return the database URL using the HTTP transport."""
+    database_url = settings.database_url.strip()
+
+    if database_url.startswith("libsql://"):
+        return "https://" + database_url[len("libsql://"):]
+
+    return database_url
+
+
 async def get_db_client():
     """Return the shared application database client."""
     global _db_client
 
     if _db_client is None:
         _db_client = libsql_client.create_client(
-            url=settings.database_url,
+            url=_get_http_database_url(),
             auth_token=settings.database_auth_token or None,
         )
 
