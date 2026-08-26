@@ -2,36 +2,66 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Optional
 
-import libsql_client
+import libsql
 
 from server.config import settings
 from server.db.schema import SCHEMA_STATEMENTS
 
 
-_db_client: Optional[object] = None
+class AsyncLibSQLResult:
+    """Async-compatible result wrapper for a synchronous libsql cursor."""
+
+    def __init__(self, cursor):
+        self._cursor = cursor
+        self.rows = cursor.fetchall()
 
 
-def _get_http_database_url() -> str:
-    """Return the database URL using the HTTP transport."""
-    database_url = settings.database_url.strip()
+class AsyncLibSQLClient:
+    """Async-compatible wrapper around the synchronous libsql client."""
 
-    if database_url.startswith("libsql://"):
-        return "https://" + database_url[len("libsql://"):]
+    def __init__(self, connection):
+        self._connection = connection
 
-    return database_url
+    async def execute(self, sql: str, args=None) -> AsyncLibSQLResult:
+        """Execute SQL without blocking the async event loop."""
+
+        def run():
+            if args is None:
+                return self._connection.execute(sql)
+
+            return self._connection.execute(sql, args)
+
+        cursor = await asyncio.to_thread(run)
+
+        return AsyncLibSQLResult(cursor)
+
+    async def close(self) -> None:
+        """Close the underlying database connection."""
+        await asyncio.to_thread(self._connection.close)
 
 
-async def get_db_client():
+_db_client: Optional[AsyncLibSQLClient] = None
+
+
+def _get_database_url() -> str:
+    """Return the configured Turso/libSQL database URL."""
+    return settings.database_url.strip()
+
+
+async def get_db_client() -> AsyncLibSQLClient:
     """Return the shared application database client."""
     global _db_client
 
     if _db_client is None:
-        _db_client = libsql_client.create_client(
-            url=_get_http_database_url(),
+        connection = libsql.connect(
+            database=_get_database_url(),
             auth_token=settings.database_auth_token or None,
         )
+
+        _db_client = AsyncLibSQLClient(connection)
 
     return _db_client
 
@@ -46,7 +76,7 @@ async def close_db_client() -> None:
 
 
 async def init_db() -> None:
-    """Create application tables."""
+    """Create application tables if they do not already exist."""
     client = await get_db_client()
 
     for statement in SCHEMA_STATEMENTS:
