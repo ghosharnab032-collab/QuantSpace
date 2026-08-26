@@ -3,3 +3,4 @@ uvicorn[standard]
 pydantic
 PyJWT
 pwdlib[argon2]
+email-validator
