@@ -1,12 +1,16 @@
 """Quant Space FastAPI application."""
+
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from server.db.database import close_db_client, init_db
+from server.db.database import close_db_client
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()
+    """Manage application shutdown without initializing the DB on startup."""
     yield
     await close_db_client()
 
@@ -62,19 +66,16 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "https://quant-space-delta.vercel.app",
     ],
-
     allow_credentials=True,
-
     allow_methods=["*"],
-
     allow_headers=["*"],
 )
+
 
 # ============================================================
 # HEALTH
@@ -94,12 +95,6 @@ async def health():
 
 # ============================================================
 # AUTH
-#
-# Router prefix:
-#     /auth
-#
-# Final:
-#     /api/v1/auth/...
 # ============================================================
 
 app.include_router(
@@ -110,13 +105,6 @@ app.include_router(
 
 # ============================================================
 # PAYMENTS
-#
-# Router prefix:
-#     /payments
-#
-# Final:
-#     POST /api/v1/payments/order
-#     POST /api/v1/payments/verify
 # ============================================================
 
 app.include_router(
@@ -127,12 +115,6 @@ app.include_router(
 
 # ============================================================
 # ENTITLEMENTS
-#
-# Router prefix:
-#     /entitlements
-#
-# Final:
-#     GET /api/v1/entitlements/{feature}
 # ============================================================
 
 app.include_router(
@@ -143,18 +125,6 @@ app.include_router(
 
 # ============================================================
 # QUANT
-#
-# quant/router.py contains:
-#
-#     /quant/monte-carlo
-#     /quant/optimizer
-#     /quant/optimizer/health
-#
-# Final:
-#
-#     POST /api/v1/quant/monte-carlo
-#     POST /api/v1/quant/optimizer
-#     GET  /api/v1/quant/optimizer/health
 # ============================================================
 
 app.include_router(
@@ -165,16 +135,6 @@ app.include_router(
 
 # ============================================================
 # MARKET DATA
-#
-# server/api/market_data.py contains:
-#
-#     /market-data/assets/{ticker}
-#     /market-data/{ticker}/history
-#
-# Final:
-#
-#     GET /api/v1/market-data/assets/{ticker}
-#     GET /api/v1/market-data/{ticker}/history
 # ============================================================
 
 app.include_router(
