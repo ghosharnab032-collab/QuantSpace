@@ -7,3 +7,5 @@ email-validator
 libsql-client
 razorpay
 numpy
+pandas
+
