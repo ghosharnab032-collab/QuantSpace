@@ -136,3 +136,4 @@ raw/
 # Generated NSE security-master downloads
 data/NSE_CM_security_*.csv
 data/NSE_CM_security_*.csv.gz
+strix_runs/razorpay_a7ea
