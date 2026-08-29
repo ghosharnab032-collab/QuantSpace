@@ -14,11 +14,13 @@ export default function Login() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
 
     setError("");
+    setSuccess("");
 
     if (!email.trim()) {
       setError("Email is required.");
@@ -44,12 +46,11 @@ export default function Login() {
           password
         );
 
-        // Registration does not necessarily return
-        // an access token, so log in afterwards.
-        await login(
-          email.trim(),
-          password
-        );
+        // Registration is complete.
+        // Switch back to login without automatically signing in.
+        setMode("login");
+        setPassword("");
+        setSuccess("Account created. Please sign in.");
       }
     } catch (err) {
       const detail =
@@ -61,6 +62,18 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function switchMode() {
+    setMode(
+      mode === "login"
+        ? "register"
+        : "login"
+    );
+
+    setError("");
+    setSuccess("");
+    setPassword("");
   }
 
   return (
@@ -127,6 +140,12 @@ export default function Login() {
             </div>
           )}
 
+          {success && (
+            <div className="login-success">
+              {success}
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
@@ -143,15 +162,7 @@ export default function Login() {
         <button
           type="button"
           className="login-switch"
-          onClick={() => {
-            setMode(
-              mode === "login"
-                ? "register"
-                : "login"
-            );
-
-            setError("");
-          }}
+          onClick={switchMode}
         >
           {mode === "login"
             ? "Create an account"

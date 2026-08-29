@@ -25,18 +25,50 @@ class AsyncLibSQLClient:
     def __init__(self, connection):
         self._connection = connection
 
+    def _execute_sync(self, sql: str, args=None):
+        """Execute SQL using the underlying synchronous connection."""
+        if args is None:
+            return self._connection.execute(sql)
+
+        return self._connection.execute(sql, args)
+
     async def execute(self, sql: str, args=None) -> AsyncLibSQLResult:
         """Execute SQL without blocking the async event loop."""
 
-        def run():
-            if args is None:
-                return self._connection.execute(sql)
+        try:
+            cursor = await asyncio.to_thread(
+                self._execute_sync,
+                sql,
+                args,
+            )
 
-            return self._connection.execute(sql, args)
+        except Exception:
+            # The remote libSQL/Hrana connection may have become stale.
+            # Close the old connection and create a fresh one.
+            await self._reconnect()
 
-        cursor = await asyncio.to_thread(run)
+            # Retry the query once using the fresh connection.
+            cursor = await asyncio.to_thread(
+                self._execute_sync,
+                sql,
+                args,
+            )
 
         return AsyncLibSQLResult(cursor)
+
+    async def _reconnect(self) -> None:
+        """Replace the underlying connection with a fresh connection."""
+        old_connection = self._connection
+
+        try:
+            await asyncio.to_thread(old_connection.close)
+        except Exception:
+            pass
+
+        self._connection = libsql.connect(
+            database=_get_database_url(),
+            auth_token=settings.database_auth_token or None,
+        )
 
     async def close(self) -> None:
         """Close the underlying database connection."""
